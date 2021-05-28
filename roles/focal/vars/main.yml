@@ -1,0 +1,4 @@
+---
+DEPLOY_SRC: "{{ role_path }}/files/docker-compose.yml"
+DEPLY_DEST: '/root/hello-world/docker-compose.yml'
+PROJECT_SRC: '/root/hello-world/'

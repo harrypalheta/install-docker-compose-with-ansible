@@ -1,0 +1,56 @@
+---
+
+- name: Install aptitude using apt
+  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+- name: Install required system packages
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt: update_cache=yes name=docker-ce state=latest
+
+- name: Install Docker Module for Python
+  pip:
+    name: 
+    - docker
+    - docker-compose
+
+- name: Creates directory
+  ansible.builtin.file:
+    path: "{{ PROJECT_SRC }}"
+    state: directory
+
+- name: Copy deploy file to remote server
+  ansible.builtin.copy:
+    src: "{{ DEPLOY_SRC }}"
+    dest: "{{ DEPLY_DEST }}"
+
+- name: Tear down existing services
+  community.docker.docker_compose:
+    project_src: "{{ PROJECT_SRC }}"
+    state: absent
+
+- name: Create and start services
+  community.docker.docker_compose:
+    project_src: "{{ PROJECT_SRC }}"
+  register: output
+
+- name: Output
+  ansible.builtin.debug:
+    var: output
+
+- name: Clean the services
+  community.docker.docker_compose:
+    project_src: "{{ PROJECT_SRC }}"
+    state: absent

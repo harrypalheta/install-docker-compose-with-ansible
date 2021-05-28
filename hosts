@@ -1,0 +1,2 @@
+[focal_hosts]
+10.0.20.4 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/focal/virtualbox/private_key
